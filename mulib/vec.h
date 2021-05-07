@@ -8,7 +8,7 @@
 #ifndef MULIB_VEC_H
 #define MULIB_VEC_H
 
-#include "common.h"
+#include <mulib/common.h>
 
 #define vec_unpack_(v) \
 	(char **)&(v)->data, &(v)->length, &(v)->capacity, sizeof(*(v)->data)

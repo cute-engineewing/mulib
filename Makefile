@@ -2,7 +2,7 @@ CC	?= gcc
 RM	= rm -f
 AR	= ar
 
-CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -Imulib -fpic
+CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -fpic -I.
 LDFLAGS	+= -shared
 
 test: CFLAGS	+=  -I. --coverage
@@ -12,7 +12,9 @@ test: CC	= gcc
 TARGET	= libmu
 
 SRCS	= map.c \
-			vec.c
+			vec.c \
+			scan.c
+
 OBJS	= $(addprefix mulib/, $(SRCS:.c=.o))
 
 TEST_SRCS	= test.c
