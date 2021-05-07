@@ -27,6 +27,6 @@ jobs:
         sudo apt-get install build-essential
         sudo apt-get install libcmocka-dev
     - name: Run tests
-      run: make test
+      run: CFLAGS="-fsanitize=address -fsanitize=undefined" LDFLAGS="-fsanitize=address -fsanitize=undefined" make test
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1

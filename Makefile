@@ -3,10 +3,10 @@ RM	= rm -f
 AR	= ar
 
 CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -fpic -Iinc
-LDFLAGS	+= -shared
+LDFLAGS	+=
 
 test: CFLAGS	+=  -Iinc --coverage
-test: LDFLAGS	= -lcmocka --coverage
+test: LDFLAGS	+= -lcmocka --coverage
 test: CC	= gcc
 
 TARGET	= libmu
@@ -23,7 +23,7 @@ TEST_OBJS	= $(addprefix tests/, $(TEST_SRCS:.c=.o))
 all: $(TARGET).a $(TARGET).so
 
 $(TARGET).so: $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $^ -shared $(LDFLAGS)
 
 $(TARGET).a: $(OBJS)
 	$(AR) rcs $@ $^
