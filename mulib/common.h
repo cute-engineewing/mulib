@@ -1,6 +1,7 @@
 #ifndef _MULIB_COMMON_H
 #define _MULIB_COMMON_H
 
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
