@@ -11,11 +11,11 @@ test: CC	= gcc
 
 TARGET	= libmu
 
-SRCS	= src/map.c \
-			src/vec.c \
-			src/scan.c
+SRCS	= map.c \
+			vec.c \
+			scan.c
 
-OBJS	= $(addprefix mulib/, $(SRCS:.c=.o))
+OBJS	= $(addprefix src/, $(SRCS:.c=.o))
 
 TEST_SRCS	= test.c
 TEST_OBJS	= $(addprefix tests/, $(TEST_SRCS:.c=.o))
