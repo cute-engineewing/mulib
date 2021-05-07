@@ -2,18 +2,18 @@ CC	?= gcc
 RM	= rm -f
 AR	= ar
 
-CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -fpic -I.
+CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -fpic -Iinc
 LDFLAGS	+= -shared
 
-test: CFLAGS	+=  -I. --coverage
+test: CFLAGS	+=  -Iinc --coverage
 test: LDFLAGS	= -lcmocka --coverage
 test: CC	= gcc
 
 TARGET	= libmu
 
-SRCS	= map.c \
-			vec.c \
-			scan.c
+SRCS	= src/map.c \
+			src/vec.c \
+			src/scan.c
 
 OBJS	= $(addprefix mulib/, $(SRCS:.c=.o))
 
