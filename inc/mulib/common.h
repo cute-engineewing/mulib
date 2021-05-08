@@ -7,4 +7,4 @@
 #include <stdlib.h>
 #include <string.h>
 
-#endif /* !_CUTEC_TOKEN_H */
+#endif /* !_MULIB_TOKEN_H */
