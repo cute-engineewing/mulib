@@ -40,10 +40,8 @@ clean:
 	$(RM) $(TEST_OBJS:.o=.gcda)
 	$(RM) $(TEST_OBJS:.o=.gcno)
 	$(RM) $(TEST_OBJS)
-
-fclean: clean
 	$(RM) $(TARGET).a $(TARGET).so
 
-re: fclean all
+re: clean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean clean re test
