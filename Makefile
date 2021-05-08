@@ -2,7 +2,7 @@ CC	?= gcc
 RM	= rm -f
 AR	= ar
 
-CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -fpic -Iinc
+CFLAGS	+= -std=c99 -pedantic -Wall -Werror -Wextra -fpic -Iinc
 LDFLAGS	+=
 
 test: CFLAGS	+=  -Iinc --coverage
@@ -13,7 +13,8 @@ TARGET	= libmu
 
 SRCS	= map.c \
 			vec.c \
-			scan.c
+			scan.c \
+			log.c
 
 OBJS	= $(addprefix src/, $(SRCS:.c=.o))
 
