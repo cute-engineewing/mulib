@@ -6,14 +6,15 @@ CFLAGS	+= -ansi -pedantic -Wall -Werror -Wextra -fpic -Iinc
 LDFLAGS	+=
 
 test: CFLAGS	+=  -Iinc --coverage
-test: LDFLAGS	+= -lcmocka --coverage
+test: LDFLAGS	+= --coverage
 test: CC	= gcc
 
 TARGET	= libmu
 
 SRCS	= map.c \
 			vec.c \
-			scan.c
+			scan.c \
+			mutest.c
 
 OBJS	= $(addprefix src/, $(SRCS:.c=.o))
 
