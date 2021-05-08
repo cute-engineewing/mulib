@@ -54,3 +54,5 @@ dkms.conf
 test
 *.gcda
 *.gcno
+
+build/

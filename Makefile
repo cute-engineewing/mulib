@@ -1,3 +1,5 @@
+DIRECTORY_GUARD=mkdir -p $(@D)
+
 CC	?= gcc
 RM	= rm -f
 AR	= ar
@@ -11,36 +13,42 @@ test: CC	= gcc
 
 TARGET	= libmu
 
+STATIC_TARGET = build/static/$(TARGET).a
+SHARED_TARGET = build/shared/$(TARGET).so
+
 SRCS	= map.c \
 			vec.c \
 			scan.c
 
-OBJS	= $(addprefix src/, $(SRCS:.c=.o))
+OBJS	= $(addprefix build/, $(SRCS:.c=.o))
 
 TEST_SRCS	= test.c
 TEST_OBJS	= $(addprefix tests/, $(TEST_SRCS:.c=.o))
 
-all: $(TARGET).a $(TARGET).so
+all: $(STATIC_TARGET) $(SHARED_TARGET)
 
-$(TARGET).so: $(OBJS)
+$(SHARED_TARGET): $(OBJS)
+	$(DIRECTORY_GUARD)
 	$(CC) -o $@ $^ -shared $(LDFLAGS)
 
-$(TARGET).a: $(OBJS)
+$(STATIC_TARGET): $(OBJS)
+	$(DIRECTORY_GUARD)
 	$(AR) rcs $@ $^
 
-%.o: %.c
+build/%.o: src/%.c
+	$(DIRECTORY_GUARD)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
-test: $(TARGET).a $(TEST_OBJS)
+test: $(STATIC_TARGET) $(TEST_OBJS)
+	$(DIRECTORY_GUARD)
 	$(CC) -o $@ $^ $(LDFLAGS)
 	@./$@
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) -r build
 	$(RM) $(TEST_OBJS:.o=.gcda)
 	$(RM) $(TEST_OBJS:.o=.gcno)
 	$(RM) $(TEST_OBJS)
-	$(RM) $(TARGET).a $(TARGET).so
 
 re: clean all
 
