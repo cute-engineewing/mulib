@@ -32,7 +32,7 @@ $(TARGET).a: $(OBJS)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 test: $(TARGET).a $(TEST_OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CC) -o $@ $(TEST_OBJS) $(LDFLAGS) -L. -l:libmu.a
 	@./$@
 
 clean:
