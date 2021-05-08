@@ -111,11 +111,15 @@ log_set_quiet(bool enable)
 int
 log_add_callback(log_Logfn_t fn, void *udata, int level)
 {
-	for (int i = 0; i < MAX_CALLBACKS; i++)
+	int i;
+
+	for (i = 0; i < MAX_CALLBACKS; i++)
 	{
 		if (!L.callbacks[i].fn)
 		{
-			L.callbacks[i] = (struct log_callback){ fn, udata, level };
+			L.callbacks[i].fn = fn;
+			L.callbacks[i].udata = udata;
+			L.callbacks[i].level = level;
 			return 0;
 		}
 	}
@@ -142,12 +146,13 @@ init_event(struct log_event *ev, void *udata)
 void
 log_log(int level, const char *file, int line, const char *fmt, ...)
 {
-	struct log_event ev = {
-		.fmt = fmt,
-		.file = file,
-		.line = line,
-		.level = level,
-	};
+	struct log_event ev;
+	int i;
+	
+	ev.fmt = fmt;
+	ev.file = file;
+	ev.line = line;
+	ev.level = level;
 
 	lock();
 
@@ -159,7 +164,7 @@ log_log(int level, const char *file, int line, const char *fmt, ...)
 		va_end(ev.ap);
 	}
 
-	for (int i = 0; i < MAX_CALLBACKS && L.callbacks[i].fn; i++)
+	for (i = 0; i < MAX_CALLBACKS && L.callbacks[i].fn; i++)
 	{
 		struct log_callback *cb = &L.callbacks[i];
 		if (level >= cb->level)
