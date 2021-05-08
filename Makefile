@@ -2,7 +2,8 @@ CC	?= gcc
 RM	= rm -f
 AR	= ar
 
-CFLAGS	+= -std=c99 -pedantic -Wall -Werror -Wextra -fpic -Iinc
+CFLAGS	+= -ansi -pedantic -pedantic-errors -Wall -Werror -Wextra -fpic -Iinc \
+			-Wno-variadic-macros
 LDFLAGS	+=
 
 test: CFLAGS	+=  -Iinc --coverage
