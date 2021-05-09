@@ -2,7 +2,7 @@ CC	?= gcc
 RM	= rm -f
 AR	= ar
 
-CFLAGS	+= -ansi -pedantic -pedantic-errors -Wall -Werror -Wextra -fpic -Iinc \
+CFLAGS	+= -std=c99 -pedantic -pedantic-errors -Wall -Werror -Wextra -fpic -Iinc \
 			-Wno-variadic-macros
 LDFLAGS	+=
 
@@ -12,12 +12,8 @@ test: CC	= gcc
 
 TARGET	= libmu
 
-SRCS	= map.c \
-			vec.c \
-			scan.c \
-			log.c
-
-OBJS	= $(addprefix src/, $(SRCS:.c=.o))
+SRCS	= $(wildcard src/*.c)
+OBJS	= $(SRCS:.c=.o)
 
 TEST_SRCS	= test.c
 TEST_OBJS	= $(addprefix tests/, $(TEST_SRCS:.c=.o))
