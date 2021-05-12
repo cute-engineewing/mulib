@@ -23,7 +23,8 @@ static struct
 	int level;
 	bool quiet;
 	struct log_callback callbacks[MAX_CALLBACKS];
-} L;
+	size_t callback_count;
+} L = {0};
 
 static const char *level_strings[] = {
 	"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL",
@@ -120,6 +121,7 @@ log_add_callback(log_Logfn_t fn, void *udata, int level)
 			L.callbacks[i].fn = fn;
 			L.callbacks[i].udata = udata;
 			L.callbacks[i].level = level;
+			L.callback_count++;
 			return 0;
 		}
 	}
@@ -147,7 +149,7 @@ void
 log_log(int level, const char *file, int line, const char *fmt, ...)
 {
 	struct log_event ev;
-	int i;
+	size_t i;
 	
 	ev.fmt = fmt;
 	ev.file = file;
@@ -164,7 +166,7 @@ log_log(int level, const char *file, int line, const char *fmt, ...)
 		va_end(ev.ap);
 	}
 
-	for (i = 0; i < MAX_CALLBACKS && L.callbacks[i].fn; i++)
+	for (i = 0; i < L.callback_count; i++)
 	{
 		struct log_callback *cb = &L.callbacks[i];
 		if (level >= cb->level)
