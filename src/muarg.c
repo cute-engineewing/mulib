@@ -113,7 +113,7 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 		return;
 	}
 
-	if (result == NULL)
+	if (argument == NULL)
 	{
 		printf("unknown argument: %s \n", current_argv);
 		exit(-1);
