@@ -76,7 +76,7 @@ parse_string_argument(struct muarg_result *info, int argv_id,
 			"%s is not a valid result for %s, must use these possible results:",
 			next_argument, argument->name);
 
-		show_help_option_possible_results(argument);
+		muarg_show_help_option_possible_results(argument);
 		printf("\n");
 		exit(1);
 	}
@@ -150,14 +150,14 @@ muarg_eval(struct muarg_header *info, int argc, char **argv)
 }
 
 void
-destroy_program_arg_result(struct muarg_result *result)
+muarg_destroy_arg_result(struct muarg_result *result)
 {
 	vec_deinit(&result->string_list);
 }
 
 /* output: {element_1|element_2|element_3} for example */
 void
-show_help_option_possible_results(struct muarg_argument_config *option)
+muarg_show_help_option_possible_results(struct muarg_argument_config *option)
 {
 	printf("{");
 
@@ -195,7 +195,7 @@ show_help_for_option(struct muarg_argument_config *option)
 	}
 	else if (option->flag & ARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
 	{
-		show_help_option_possible_results(option);
+		muarg_show_help_option_possible_results(option);
 		printf("\t%-15s\t  ", "");	  // realign everything
 	}
 	else
@@ -207,7 +207,7 @@ show_help_for_option(struct muarg_argument_config *option)
 }
 
 void
-show_help(struct muarg_header *info)
+muarg_show_help(struct muarg_header *info)
 {
 	if (info->usage != NULL)
 	{
@@ -232,7 +232,7 @@ show_help(struct muarg_header *info)
 }
 
 void
-show_version(struct muarg_header *info)
+muarg_show_version(struct muarg_header *info)
 {
 	printf("%s version %s \n", info->app_name, info->version);
 }

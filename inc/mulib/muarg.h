@@ -33,7 +33,8 @@ struct muarg_header
 
 struct muarg_argument_status
 {
-	bool is_called; /* true if you have the argument in the command line arguments */
+	bool is_called; /* true if you have the argument in the command line
+					   arguments */
 	const char *input;
 };
 
@@ -73,7 +74,7 @@ struct muarg_result
 		*argument_list; /* same argument list in header */
 };
 
-#define CREATE_MUARG_HEADER(app_name, app_argument_help, help_information,     \
+#define MUARG_CREATE_HEADER(app_name, app_argument_help, help_information,     \
 							version, arg_list)                                 \
 	{                                                                          \
 		app_name, app_argument_help, help_information, version,                \
@@ -102,19 +103,21 @@ struct muarg_result
 struct muarg_result muarg_eval(struct muarg_header *info, int argc,
 							   char **argv);
 
-void destroy_program_arg_result(struct muarg_result *result);
+void muarg_destroy_arg_result(struct muarg_result *result);
 
-void show_help(struct muarg_header *info);
+void muarg_show_help(struct muarg_header *info);
 
-void show_version(struct muarg_header *info);
+void
+muarg_show_help_option_possible_results(struct muarg_argument_config *option);
 
-void show_help_option_possible_results(struct muarg_argument_config *option);
+void muarg_show_version(struct muarg_header *info);
 
 #define MUARG_HELP()                                                           \
-	MUARG_BOOL("help", "h", "display help information", show_help)
+	MUARG_BOOL("help", "h", "display help information", muarg_show_help)
 
 #define MUARG_VERSION()                                                        \
-	MUARG_BOOL("version", "v", "display the program version", show_version)
+	MUARG_BOOL("version", "v", "display the program version",                  \
+			   muarg_show_version)
 
 /* get an argument status from its name */
 
