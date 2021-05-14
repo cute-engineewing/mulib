@@ -1,4 +1,4 @@
-#include <mulib/muarg.h>
+#include <mulib/arg.h>
 
 struct muarg_argument_config *
 find_argument_from_name(struct muarg_header *info, const char *name)
