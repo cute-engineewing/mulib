@@ -46,7 +46,7 @@ is_a_valid_result(const char *str, struct muarg_argument_config *argument)
 }
 
 /* add string argument to the last entry of muarg_result.option_list */
-void
+int
 parse_string_argument(struct muarg_result *info, int argv_id,
 					  struct muarg_argument_config *argument)
 {
@@ -60,7 +60,8 @@ parse_string_argument(struct muarg_result *info, int argv_id,
 	if (next_argument == NULL)
 	{
 		printf("parameter: %s require a string argument \n", argument->name);
-		exit(1);
+
+		return MUARG_ERROR;
 	}
 
 	argument->status.input = next_argument;
@@ -69,7 +70,7 @@ parse_string_argument(struct muarg_result *info, int argv_id,
 	{
 		if (is_a_valid_result(next_argument, argument))
 		{
-			return;
+			return MUARG_SUCCESS;
 		}
 
 		printf(
@@ -78,21 +79,25 @@ parse_string_argument(struct muarg_result *info, int argv_id,
 
 		muarg_show_help_option_possible_results(argument);
 		printf("\n");
-		exit(1);
+
+		return MUARG_ERROR;
 	}
+	return MUARG_SUCCESS;
 }
 
-void
+int
 parse_string_value(struct muarg_result *final, int argv_id)
 {
 	int res = vec_push(&final->string_list, final->raw_arguments[argv_id]);
 	if (res != 0)
 	{
-		exit(1);
+		printf("vector push error \n");
+		return MUARG_ERROR;
 	}
+	return MUARG_SUCCESS;
 }
 
-void
+int
 parse_single_argument(struct muarg_result *result, int argv_id,
 					  struct muarg_header *option)
 {
@@ -108,32 +113,36 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 		if (strlen(current_argv) > 2)
 		{
 			printf("error: argument %s is not recognised\n", current_argv);
-			return;
+			return MUARG_ERROR;
 		}
 		argument = find_argument_from_short_name(option, *(current_argv + 1));
 	}
 	else
 	{
-		parse_string_value(result, argv_id);
-		return;
+		return parse_string_value(result, argv_id);
+
 	}
 
 	if (argument == NULL)
 	{
 		printf("unknown argument: %s \n", current_argv);
-		exit(-1);
+		return MUARG_ERROR;
 	}
 
 	argument->status.is_called = true;
 	if ((argument->flag & MUARG_FLAG_STRING ||
 		 argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT))
 	{
-		parse_string_argument(result, argv_id, argument);
+		if(parse_string_argument(result, argv_id, argument) == MUARG_ERROR)
+		{
+			return MUARG_ERROR;
+		}
 	}
 	if (argument->callback != NULL)
 	{
 		argument->callback(option);
 	}
+	return MUARG_SUCCESS;
 }
 
 struct muarg_result
@@ -144,11 +153,11 @@ muarg_eval(struct muarg_header *info, int argc, char **argv)
 	result.raw_arguments = argv;
 	result.argument_count = info->argument_count;
 	result.argument_list = info->argument_list;
-
+	result.has_error = MUARG_SUCCESS;
 	vec_init(&result.string_list);
 	for (int i = 1; i < argc; i++)
 	{
-		parse_single_argument(&result, i, info);
+		result.has_error |= parse_single_argument(&result, i, info);
 	}
 
 	return result;

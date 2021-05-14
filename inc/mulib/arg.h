@@ -17,6 +17,9 @@
 
 #define MUARG_NO_SHORTNAME (0)
 
+#define MUARG_ERROR 1
+#define MUARG_SUCCESS 0
+
 struct muarg_header
 {
 	/* must not be null */
@@ -75,6 +78,8 @@ struct muarg_result
 	size_t argument_count; /* argument count in argument_list */
 	struct muarg_argument_config
 		*argument_list; /* same argument list in header */
+
+	int has_error; /* see MUARG_SUCCESS or MUARG_ERROR */
 };
 
 #define MUARG_CREATE_HEADER(app_name, app_argument_help, help_information,     \
