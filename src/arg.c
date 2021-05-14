@@ -32,7 +32,7 @@ find_argument_from_short_name(struct muarg_header *info, const char *name)
 bool
 is_a_valid_result(const char *str, struct muarg_argument_config *argument)
 {
-	if (argument->flag & ARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
+	if (argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
 	{
 		for (size_t i = 0; i < argument->arg_enum_count; i++)
 		{
@@ -65,7 +65,7 @@ parse_string_argument(struct muarg_result *info, int argv_id,
 
 	argument->status.input = next_argument;
 
-	if (argument->flag & ARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
+	if (argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
 	{
 		if (is_a_valid_result(next_argument, argument))
 		{
@@ -120,8 +120,8 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 	}
 
 	argument->status.is_called = true;
-	if ((argument->flag & ARG_FLAG_STRING ||
-		 argument->flag & ARG_FLAG_USE_ONLY_POSSIBLE_RESULT))
+	if ((argument->flag & MUARG_FLAG_STRING ||
+		 argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT))
 	{
 		parse_string_argument(result, argv_id, argument);
 	}
@@ -189,11 +189,11 @@ show_help_for_option(struct muarg_argument_config *option)
 		printf("\t -%-10s", option->short_name);
 	}
 
-	if (option->flag & ARG_FLAG_STRING)
+	if (option->flag & MUARG_FLAG_STRING)
 	{
 		printf("%-5s", "{...}");
 	}
-	else if (option->flag & ARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
+	else if (option->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
 	{
 		muarg_show_help_option_possible_results(option);
 		printf("\t%-15s\t  ", "");	  // realign everything
