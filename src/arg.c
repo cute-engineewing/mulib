@@ -1,4 +1,21 @@
+#include <ctype.h>
 #include <mulib/arg.h>
+
+/* TODO: move this to another string utility library */
+bool
+is_string_a_number(const char *str)
+{
+	size_t length = strlen(str);
+
+	for (size_t i = 0; i < length; i++)
+	{
+		if (!(isdigit(str[i]) || str[i] == '-'))
+		{
+			return false;
+		}
+	}
+	return true;
+}
 
 static struct muarg_argument_config *
 find_argument_from_name(struct muarg_argument_config *array,
@@ -46,20 +63,12 @@ is_a_valid_result(const char *str, struct muarg_argument_config *argument)
 
 /* add string argument to the last entry of muarg_result.option_list */
 static int
-parse_string_argument(struct muarg_result *info, int argv_id,
+parse_string_argument(char *next_argument,
 					  struct muarg_argument_config *argument)
 {
-	char *next_argument = NULL;
-
-	if (info->raw_argument_count > argv_id + 1)
-	{
-		next_argument = info->raw_arguments[argv_id + 1];
-	}
-
 	if (next_argument == NULL)
 	{
 		printf("parameter: %s require a string argument \n", argument->name);
-
 		return MUARG_ERROR;
 	}
 
@@ -83,6 +92,26 @@ parse_string_argument(struct muarg_result *info, int argv_id,
 	}
 	return MUARG_SUCCESS;
 }
+static int
+parse_int_argument(char *next_argument, struct muarg_argument_config *argument)
+{
+	if (next_argument == NULL)
+	{
+		printf("parameter: %s require a int argument \n", argument->name);
+		return MUARG_ERROR;
+	}
+
+	if (!is_string_a_number(next_argument))
+	{
+		printf("parameter: %s require a int argument (not a string)\n",
+			   argument->name);
+		return MUARG_ERROR;
+	}
+
+	argument->status.input = next_argument;
+	argument->status.value = atol(next_argument);
+	return MUARG_SUCCESS;
+}
 
 static int
 parse_string_value(struct muarg_result *final, int argv_id)
@@ -97,10 +126,10 @@ parse_string_value(struct muarg_result *final, int argv_id)
 }
 
 static int
-parse_single_argument(struct muarg_result *result, int argv_id,
+parse_single_argument(struct muarg_result *result, int *argv_id,
 					  struct muarg_header *option)
 {
-	char *current_argv = result->raw_arguments[argv_id];
+	char *current_argv = result->raw_arguments[*argv_id];
 	struct muarg_argument_config *argument = NULL;
 
 	if (strncmp("--", current_argv, 2) == 0)	// long name
@@ -120,7 +149,7 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 	}
 	else
 	{
-		return parse_string_value(result, argv_id);
+		return parse_string_value(result, *argv_id);
 	}
 
 	if (argument == NULL)
@@ -129,15 +158,33 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 		return MUARG_ERROR;
 	}
 
-	argument->status.is_called = true;
-	if ((argument->flag & MUARG_FLAG_STRING ||
-		 argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT))
+	char *next_argument = NULL;
+	if (*argv_id + 1 < result->raw_argument_count)
 	{
-		if (parse_string_argument(result, argv_id, argument) == MUARG_ERROR)
+		next_argument = result->raw_arguments[*argv_id + 1];
+	}
+
+	argument->status.is_called = true;
+
+	if (argument->flag & MUARG_FLAG_STRING ||
+		argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
+	{
+		if (parse_string_argument(next_argument, argument) == MUARG_ERROR)
 		{
 			return MUARG_ERROR;
 		}
+		(*argv_id)++;
 	}
+
+	else if (argument->flag & MUARG_FLAG_INT)
+	{
+		if (parse_int_argument(next_argument, argument) == MUARG_ERROR)
+		{
+			return MUARG_ERROR;
+		}
+		(*argv_id)++;
+	}
+
 	if (argument->callback != NULL)
 	{
 		argument->callback(option);
@@ -157,7 +204,7 @@ muarg_eval(struct muarg_header *info, int argc, char **argv)
 	vec_init(&result.string_list);
 	for (int i = 1; i < argc; i++)
 	{
-		result.has_error |= parse_single_argument(&result, i, info);
+		result.has_error |= parse_single_argument(&result, &i, info);
 	}
 
 	return result;
@@ -203,14 +250,18 @@ show_help_for_option(struct muarg_argument_config *option)
 		printf("\t -%-10c", option->short_name);
 	}
 
-	if (option->flag & MUARG_FLAG_STRING)
-	{
-		printf("%-5s", "{...}");
-	}
-	else if (option->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
+	if (option->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
 	{
 		muarg_show_help_option_possible_results(option);
 		printf("\t%-15s\t  ", "");	  // realign everything
+	}
+	else if (option->flag & MUARG_FLAG_STRING)
+	{
+		printf("%-5s", "{str}");
+	}
+	else if (option->flag & MUARG_FLAG_INT)
+	{
+		printf("%-5s", "{int}");
 	}
 	else
 	{

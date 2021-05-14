@@ -6,18 +6,21 @@
 /* true when you have it and false when the argument don't exist */
 #define MUARG_FLAG_BOOL (1 << 1)
 
-/* for exemple --name "hey" */
+/* for example --name "hey" */
 #define MUARG_FLAG_STRING (1 << 2)
 
 /* force the use of a possible result, must use
  * CREATE_MUARG_WITH_POSSIBLE_RESULT_LIST */
 #define MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT (1 << 3)
 
+/* force the use of an int: example --memory 4096 */
+#define MUARG_FLAG_INT (1 << 4)
+
 #define MUARG_NO_CALLBACK NULL
 
 #define MUARG_NO_SHORTNAME (0)
 
-#define MUARG_ERROR 1
+#define MUARG_ERROR	  1
 #define MUARG_SUCCESS 0
 
 struct muarg_header
@@ -41,11 +44,12 @@ struct muarg_argument_status
 	bool is_called; /* true if you have the argument in the command line
 					   arguments */
 	const char *input;
+	long value; /* only with MUARG_FLAG_INT */
 };
 
 #define MUARG_DEFAULT_ARGUMENT_STATUS                                          \
 	{                                                                          \
-		false, ""                                                              \
+		false, "", 0                                                           \
 	}
 
 struct muarg_argument_config
@@ -101,11 +105,17 @@ struct muarg_result
 			MUARG_DEFAULT_ARGUMENT_STATUS                                      \
 	}
 
+#define MUARG_INT(name, short_name, help_msg, callback)                        \
+	{                                                                          \
+		MUARG_FLAG_INT, name, short_name, help_msg, 0, NULL, callback,         \
+			MUARG_DEFAULT_ARGUMENT_STATUS                                      \
+	}
+
 #define MUARG_ENUM(name, short_name, help_msg, enums, callback)                \
 	{                                                                          \
-		(MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT), name, short_name, help_msg,     \
-			sizeof((enums)) / sizeof((enums)[0]), (enums), callback,           \
-			MUARG_DEFAULT_ARGUMENT_STATUS                                      \
+		(MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT | MUARG_FLAG_STRING), name,       \
+			short_name, help_msg, sizeof((enums)) / sizeof((enums)[0]),        \
+			(enums), callback, MUARG_DEFAULT_ARGUMENT_STATUS                   \
 	}
 
 struct muarg_result muarg_eval(struct muarg_header *info, int argc,
