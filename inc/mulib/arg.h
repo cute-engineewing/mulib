@@ -15,6 +15,8 @@
 
 #define MUARG_NO_CALLBACK NULL
 
+#define MUARG_NO_SHORTNAME (0)
+
 struct muarg_header
 {
 	/* must not be null */
@@ -47,8 +49,8 @@ struct muarg_argument_config
 {
 	uint32_t flag;
 
-	const char *name;		   // must not be NULL
-	const char *short_name;	   // can be NULL
+	const char *name;	 // must not be NULL
+	char short_name;	 // can be 0
 
 	const char *help_msg;	 // can be NULL
 
@@ -96,7 +98,7 @@ struct muarg_result
 
 #define MUARG_ENUM(name, short_name, help_msg, enums, callback)                \
 	{                                                                          \
-		(MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT), name, short_name, help_msg,       \
+		(MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT), name, short_name, help_msg,     \
 			sizeof((enums)) / sizeof((enums)[0]), (enums), callback,           \
 			MUARG_DEFAULT_ARGUMENT_STATUS                                      \
 	}
@@ -114,10 +116,10 @@ muarg_show_help_option_possible_results(struct muarg_argument_config *option);
 void muarg_show_version(struct muarg_header *info);
 
 #define MUARG_HELP()                                                           \
-	MUARG_BOOL("help", "h", "display help information", muarg_show_help)
+	MUARG_BOOL("help", 'h', "display help information", muarg_show_help)
 
 #define MUARG_VERSION()                                                        \
-	MUARG_BOOL("version", "v", "display the program version",                  \
+	MUARG_BOOL("version", 'v', "display the program version",                  \
 			   muarg_show_version)
 
 /* get an argument status from its name */
@@ -128,7 +130,6 @@ muarg_status_from_name(struct muarg_result *result, const char *name);
 
 /* aka -name */
 struct muarg_argument_status *
-muarg_status_from_short_name(struct muarg_result *result,
-							 const char *short_name);
+muarg_status_from_short_name(struct muarg_result *result, char short_name);
 
 #endif /* !_MULIB_ARG_PARSER_H */

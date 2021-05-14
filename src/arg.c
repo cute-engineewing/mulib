@@ -15,12 +15,12 @@ find_argument_from_name(struct muarg_header *info, const char *name)
 }
 
 struct muarg_argument_config *
-find_argument_from_short_name(struct muarg_header *info, const char *name)
+find_argument_from_short_name(struct muarg_header *info, char name)
 {
 	for (size_t i = 0; i < info->argument_count; i++)
 	{
-		if (info->argument_list[i].short_name != NULL &&
-			strcmp(info->argument_list[i].short_name, name) == 0)
+		if (info->argument_list[i].short_name != MUARG_NO_SHORTNAME &&
+			info->argument_list[i].short_name == name)
 		{
 			return &info->argument_list[i];
 		}
@@ -103,9 +103,14 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 	{
 		argument = find_argument_from_name(option, current_argv + 2);
 	}
-	else if (strncmp("-", current_argv, 1) == 0)	// short name
+	else if (current_argv[0] == '-')	// short name
 	{
-		argument = find_argument_from_short_name(option, current_argv + 1);
+		if (strlen(current_argv) > 2)
+		{
+			printf("error: argument %s is not recognised\n", current_argv);
+			return;
+		}
+		argument = find_argument_from_short_name(option, *(current_argv + 1));
 	}
 	else
 	{
@@ -184,9 +189,9 @@ show_help_for_option(struct muarg_argument_config *option)
 	{
 		printf("\t --%-10s", option->name);
 	}
-	else if (option->short_name != NULL)
+	else if (option->short_name != MUARG_NO_SHORTNAME)
 	{
-		printf("\t -%-10s", option->short_name);
+		printf("\t -%-10c", option->short_name);
 	}
 
 	if (option->flag & MUARG_FLAG_STRING)
@@ -251,12 +256,11 @@ muarg_status_from_name(struct muarg_result *result, const char *name)
 }
 
 struct muarg_argument_status *
-muarg_status_from_short_name(struct muarg_result *result,
-							 const char *short_name)
+muarg_status_from_short_name(struct muarg_result *result, char short_name)
 {
 	for (size_t i = 0; i < result->argument_count; i++)
 	{
-		if (strcmp(result->argument_list[i].short_name, short_name) == 0)
+		if (result->argument_list[i].short_name == short_name)
 		{
 			return &result->argument_list[i].status;
 		}
