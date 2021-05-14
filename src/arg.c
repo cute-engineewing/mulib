@@ -34,14 +34,11 @@ find_argument_from_short_name(struct muarg_argument_config *array,
 static bool
 is_a_valid_result(const char *str, struct muarg_argument_config *argument)
 {
-	if (argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT)
+	for (size_t i = 0; i < argument->arg_enum_count; i++)
 	{
-		for (size_t i = 0; i < argument->arg_enum_count; i++)
+		if (strcmp(str, argument->arg_enum[i]) == 0)
 		{
-			if (strcmp(str, argument->arg_enum[i]) == 0)
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 	return false;
