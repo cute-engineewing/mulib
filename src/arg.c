@@ -1,13 +1,14 @@
 #include <mulib/arg.h>
 
 struct muarg_argument_config *
-find_argument_from_name(struct muarg_header *info, const char *name)
+find_argument_from_name(struct muarg_argument_config *array,
+						size_t argument_count, const char *name)
 {
-	for (size_t i = 0; i < info->argument_count; i++)
+	for (size_t i = 0; i < argument_count; i++)
 	{
-		if (strcmp(info->argument_list[i].name, name) == 0)
+		if (strcmp(array[i].name, name) == 0)
 		{
-			return &info->argument_list[i];
+			return &array[i];
 		}
 	}
 
@@ -15,14 +16,15 @@ find_argument_from_name(struct muarg_header *info, const char *name)
 }
 
 struct muarg_argument_config *
-find_argument_from_short_name(struct muarg_header *info, char name)
+find_argument_from_short_name(struct muarg_argument_config *array,
+							  size_t argument_count, char name)
 {
-	for (size_t i = 0; i < info->argument_count; i++)
+	for (size_t i = 0; i < argument_count; i++)
 	{
-		if (info->argument_list[i].short_name != MUARG_NO_SHORTNAME &&
-			info->argument_list[i].short_name == name)
+		if (array[i].short_name != MUARG_NO_SHORTNAME &&
+			array[i].short_name == name)
 		{
-			return &info->argument_list[i];
+			return &array[i];
 		}
 	}
 
@@ -106,7 +108,8 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 
 	if (strncmp("--", current_argv, 2) == 0)	// long name
 	{
-		argument = find_argument_from_name(option, current_argv + 2);
+		argument = find_argument_from_name(
+			option->argument_list, option->argument_count, current_argv + 2);
 	}
 	else if (current_argv[0] == '-')	// short name
 	{
@@ -115,12 +118,12 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 			printf("error: argument %s is not recognised\n", current_argv);
 			return MUARG_ERROR;
 		}
-		argument = find_argument_from_short_name(option, *(current_argv + 1));
+		argument = find_argument_from_short_name(
+			option->argument_list, option->argument_count, *(current_argv + 1));
 	}
 	else
 	{
 		return parse_string_value(result, argv_id);
-
 	}
 
 	if (argument == NULL)
@@ -133,7 +136,7 @@ parse_single_argument(struct muarg_result *result, int argv_id,
 	if ((argument->flag & MUARG_FLAG_STRING ||
 		 argument->flag & MUARG_FLAG_USE_ONLY_POSSIBLE_RESULT))
 	{
-		if(parse_string_argument(result, argv_id, argument) == MUARG_ERROR)
+		if (parse_string_argument(result, argv_id, argument) == MUARG_ERROR)
 		{
 			return MUARG_ERROR;
 		}
