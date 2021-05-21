@@ -1,21 +1,6 @@
 #include <ctype.h>
 #include <mulib/arg.h>
-
-/* TODO: move this to another string utility library */
-bool
-is_string_a_number(const char *str)
-{
-	size_t length = strlen(str);
-
-	for (size_t i = 0; i < length; i++)
-	{
-		if (!(isdigit(str[i]) || str[i] == '-'))
-		{
-			return false;
-		}
-	}
-	return true;
-}
+#include <mulib/str.h>
 
 static struct muarg_argument_config *
 find_argument_from_name(struct muarg_argument_config *array,
@@ -101,7 +86,7 @@ parse_int_argument(char *next_argument, struct muarg_argument_config *argument)
 		return MUARG_ERROR;
 	}
 
-	if (!is_string_a_number(next_argument))
+	if (!mustr_is_string_a_number(next_argument))
 	{
 		printf("parameter: %s require a int argument (not a string)\n",
 			   argument->name);
