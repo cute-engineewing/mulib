@@ -24,7 +24,7 @@ static struct
 	bool quiet;
 	struct log_callback callbacks[MAX_CALLBACKS];
 	size_t callback_count;
-} L = {0};
+} L = { 0 };
 
 static const char *level_strings[] = {
 	"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL",
@@ -150,7 +150,7 @@ log_log(int level, const char *file, int line, const char *fmt, ...)
 {
 	struct log_event ev;
 	size_t i;
-	
+
 	ev.fmt = fmt;
 	ev.file = file;
 	ev.line = line;
